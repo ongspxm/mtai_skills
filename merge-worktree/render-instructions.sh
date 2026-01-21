@@ -68,6 +68,7 @@ NOTE: Each command runs in its own shell. \`/merge\` switches the working direct
    - \`git worktree remove ${git_worktree_path}\` (only after verification).
    - \`git branch -D ${current_branch_val}\` in ${git_root_val} if the branch still exists.
 6. Report back with a concise command log and any conflicts you resolved.
+7. cd back into ${git_root_val}
 
 Absolute rules: no network operations, no resets, no dropping local history, no blanket "ours/theirs" strategies.
 
