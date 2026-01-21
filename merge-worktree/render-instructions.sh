@@ -25,13 +25,7 @@ clean_or_dirty() {
 }
 
 default_branch() {
-  local ref
-  ref=$(git symbolic-ref refs/remotes/origin/HEAD 2>/dev/null || true)
-  if [[ -n "${ref}" ]]; then
-    echo "${ref##refs/remotes/origin/}"
-  else
-    echo "main"
-  fi
+  git -C "${REPO_ROOT}" rev-parse --abbrev-ref HEAD 2>/dev/null || echo "main"
 }
 
 git_root_val=$(git_root)
