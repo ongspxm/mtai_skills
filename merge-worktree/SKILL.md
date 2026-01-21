@@ -11,8 +11,7 @@ script in the repo root.
 
 ## Quick Start
 
-1. Run `bash <path-to-skill>/render-instructions.sh <repo_root>` from anywhere
-   (or `./render-instructions.sh <repo_root>` inside the skill directory).
+1. Run `bash <path-to-skill>/render-instructions.sh` from the working dir.
 2. Follow the steps in the rendered instructions to merge or cherry-pick.
 
 ## Workflow
@@ -26,4 +25,4 @@ script in the repo root.
 ## Helper Script
 
 Use `render-instructions.sh` to render the instruction template with current
-repo values (for example `bash <path-to-skill>/render-instructions.sh <repo_root>`).
+repo values (for example `bash <path-to-skill>/render-instructions.sh`).
