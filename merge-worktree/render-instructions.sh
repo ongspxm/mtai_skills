@@ -57,7 +57,7 @@ NOTE: Each command runs in its own shell. \`/merge\` switches the working direct
    - Run \`git merge --squash ${current_branch_val}\`.
    - Resolve conflicts line by line; keep intent from both branches.
    - Look at \`git diff\` to decide what to name the squash commit.
-   - Run \`git commit -m "squash: merge ${current_branch_val}"\` once staged changes look correct.
+   - Run \`git commit -m "<appropriate commit message>"\` once staged changes look correct.
    - No network commands, no \`git reset --hard\`, no \`git checkout -- .\`, no \`git clean\`, and no \`-X ours/theirs\`.
    - WARNING: Do not delete files, rewrite them in full, or checkout/prefer commits from one branch over another. Instead use apply_patch to surgically resolve conflicts, even if they are large in scale. Work on each conflict, line by line, so both branches' changes survive.
    - If you stashed in step 2, apply/pop it now and commit if needed.
@@ -65,7 +65,7 @@ NOTE: Each command runs in its own shell. \`/merge\` switches the working direct
    - \`git status\` is clean.
    - No MERGE_HEAD/rebase/cherry-pick artifacts remain.
 5. Cleanup:
-   - \`git worktree remove ${git_root_val}\` (only after verification).
+   - \`git worktree remove ${git_worktree_path}\` (only after verification).
    - \`git branch -D ${current_branch_val}\` in ${git_root_val} if the branch still exists.
 6. Report back with a concise command log and any conflicts you resolved.
 
