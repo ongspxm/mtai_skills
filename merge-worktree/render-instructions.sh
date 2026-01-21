@@ -1,23 +1,23 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-repo_root=${1:-.}
-cd "${repo_root}"
+git_worktree_path=${1:-.}
+cd "${git_worktree_path}"
 
 git_root() {
-  git rev-parse --show-toplevel
+  git -C "${git_worktree_path}" worktree list --porcelain | awk 'NR==1{print $2; exit}'
 }
 
 current_branch() {
-  git rev-parse --abbrev-ref HEAD
+  git -C "${git_worktree_path}" rev-parse --abbrev-ref HEAD
 }
 
 current_sha() {
-  git rev-parse HEAD
+  git -C "${git_worktree_path}" rev-parse HEAD
 }
 
 clean_or_dirty() {
-  if [[ -n "$(git status --porcelain=v1)" ]]; then
+  if [[ -n "$(git -C "${git_worktree_path}" status --porcelain=v1)" ]]; then
     echo "dirty"
   else
     echo "clean"
@@ -25,7 +25,7 @@ clean_or_dirty() {
 }
 
 default_branch() {
-  git -C "${repo_root}" rev-parse --abbrev-ref HEAD 2>/dev/null || echo "main"
+  git -C "${git_worktree_path}" rev-parse --abbrev-ref HEAD 2>/dev/null || echo "main"
 }
 
 git_root_val=$(git_root)
@@ -35,21 +35,21 @@ worktree_status_val=$(clean_or_dirty)
 default_branch_val=$(default_branch)
 default_branch_line_val="origin/${default_branch_val}"
 repo_status_val=$(clean_or_dirty)
-worktree_diff_summary_val=$(git --no-pager diff --stat || true)
+worktree_diff_summary_val=$(git -C "${git_worktree_path}" --no-pager diff --stat || true)
 
 instruction_template=$(cat <<INSTR
 [developer] Finish the merge manually with the steps below.
 
 Context:
-- Worktree path: ${git_root_val} — branch ${current_branch_val} @ ${current_sha_val}, status ${worktree_status_val}
+- Worktree path: ${git_worktree_path} — branch ${current_branch_val} @ ${current_sha_val}, status ${worktree_status_val}
 - Repo root path (current cwd): ${git_root_val} — target ${default_branch_line_val} checkout, status ${repo_status_val}
 
 NOTE: Each command runs in its own shell. \`/merge\` switches the working directory to the repo root; use \`git -C <path> ...\` or \`cd <path> && ...\` whenever you need to operate in a different directory.
 
-1. Worktree prep (worktree ${git_root_val} on ${current_branch_val}):
+1. Worktree prep (worktree ${git_worktree_path} on ${current_branch_val}):
    - Review \`git status\`.
    - Stage and commit every change that belongs in the merge. Use descriptive messages; no network commands and no resets.
-   - Run worktree commands as \`git -C ${git_root_val}\` (or \`cd ${git_root_val} && ...\`) so they execute inside the worktree.
+   - Run worktree commands as \`git -C ${git_worktree_path}\` (or \`cd ${git_worktree_path} && ...\`) so they execute inside the worktree.
 2. Default-branch checkout prep (repo root ${git_root_val}):
    - If HEAD is not ${default_branch_val}, run \`git checkout ${default_branch_val}\`.
    - If this checkout is dirty, stash with a clear message before continuing.
