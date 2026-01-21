@@ -6,8 +6,8 @@ description: Merge or cherry-pick a worktree branch back into the repo root usin
 # Merge Worktree
 
 Use this skill when a worktree contains changes that must be merged into the
-default branch at the repo root. This workflow is driven by a single script in
-the repo root.
+default branch at the repo root. This workflow is driven by a single renderer
+script in the repo root.
 
 ## Quick Start
 
@@ -25,5 +25,5 @@ the repo root.
 
 ## Helper Script
 
-Use `<path-to-skill>/render-instructions.sh` to render the instruction
-template with current repo values.
+Use `render-instructions.sh` to render the instruction template with current
+repo values (for example `bash <path-to-skill>/render-instructions.sh <repo_root>`).

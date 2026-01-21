@@ -25,7 +25,7 @@ clean_or_dirty() {
 }
 
 default_branch() {
-  git -C "${REPO_ROOT}" rev-parse --abbrev-ref HEAD 2>/dev/null || echo "main"
+  git -C "${repo_root}" rev-parse --abbrev-ref HEAD 2>/dev/null || echo "main"
 }
 
 git_root_val=$(git_root)
