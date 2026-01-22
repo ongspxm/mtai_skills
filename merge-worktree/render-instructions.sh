@@ -47,8 +47,10 @@ Context:
 NOTE: Each command runs in its own shell. \`/merge\` switches the working directory to the repo root; use \`git -C <path> ...\` or \`cd <path> && ...\` whenever you need to operate in a different directory.
 
 1. Worktree prep (worktree ${git_worktree_path} on ${current_branch_val}):
+   - cd into ${git_worktree_path}
    - Review \`git status\`.
-   - Stage and commit every change that belongs in the merge. Use descriptive messages; no network commands and no resets.
+   - Stage and commit every change (including new files). Use descriptive messages; no network commands and no resets.
+   - If unsure, clarify with user to make sure all the required changes is commited.
    - Run worktree commands as \`git -C ${git_worktree_path}\` (or \`cd ${git_worktree_path} && ...\`) so they execute inside the worktree.
 2. Default-branch checkout prep (repo root ${git_root_val}):
    - If HEAD is not ${default_branch_val}, run \`git checkout ${default_branch_val}\`.
