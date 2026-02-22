@@ -1,8 +1,12 @@
 #!/usr/bin/env python3
 import argparse
+import base64
+import hashlib
 import json
 import os
+import secrets
 import sys
+import webbrowser
 from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
@@ -14,6 +18,11 @@ from urllib.request import Request, urlopen
 
 DEFAULT_API_BASE = "https://tasks.googleapis.com/tasks/v1"
 DEFAULT_TOKEN_URL = "https://oauth2.googleapis.com/token"
+DEFAULT_AUTH_URL = "https://accounts.google.com/o/oauth2/v2/auth"
+TASKS_SCOPES = [
+    "https://www.googleapis.com/auth/tasks",
+    "https://www.googleapis.com/auth/tasks.readonly",
+]
 
 
 class CliError(RuntimeError):
@@ -79,9 +88,108 @@ class GoogleTasksClient:
 
         self.base_url = self.api.get("base_url") or DEFAULT_API_BASE
         self.token_url = self.api.get("token_url") or DEFAULT_TOKEN_URL
+        self.auth_url = self.api.get("auth_url") or DEFAULT_AUTH_URL
         self.edit_whitelist = self.cfg.get("edit_whitelist") or []
         if not isinstance(self.edit_whitelist, list):
             raise CliError("config field edit_whitelist must be a list")
+
+    def _token_scopes(self, access_token: str) -> set[str] | None:
+        try:
+            data = _http_json(
+                "GET",
+                f"https://www.googleapis.com/oauth2/v3/tokeninfo?access_token={access_token}",
+                {},
+            )
+        except CliError:
+            return None
+        raw = str(data.get("scope", "")).strip()
+        if not raw:
+            return set()
+        return {x for x in raw.split(" ") if x}
+
+    def _has_required_tasks_scopes(self, access_token: str) -> bool | None:
+        scopes = self._token_scopes(access_token)
+        if scopes is None:
+            return None
+        return all(scope in scopes for scope in TASKS_SCOPES)
+
+    def _interactive_auth_for_tasks_scope(self) -> dict[str, str]:
+        client_id = self.tokens.get("client_id")
+        client_secret = self.tokens.get("client_secret")
+        if not client_id:
+            raise CliError("missing tokens.client_id in config")
+
+        verifier = base64.urlsafe_b64encode(secrets.token_bytes(64)).decode().rstrip("=")
+        challenge = base64.urlsafe_b64encode(hashlib.sha256(verifier.encode("utf-8")).digest()).decode().rstrip("=")
+        redirect_uri = "http://localhost"
+        params = {
+            "client_id": client_id,
+            "redirect_uri": redirect_uri,
+            "response_type": "code",
+            "scope": " ".join(TASKS_SCOPES),
+            "access_type": "offline",
+            "prompt": "consent",
+            "include_granted_scopes": "true",
+            "code_challenge": challenge,
+            "code_challenge_method": "S256",
+        }
+        auth_url = self.auth_url + "?" + urlencode(params)
+        print("Open this URL and authorize:")
+        print(auth_url)
+        try:
+            webbrowser.open(auth_url)
+        except Exception:
+            pass
+        provided = input("Paste auth code or full redirect URL: ").strip()
+        code = provided
+        if "code=" in provided:
+            code = provided.split("code=", 1)[1].split("&", 1)[0]
+        if not code:
+            raise CliError("no authorization code provided")
+
+        form = {
+            "grant_type": "authorization_code",
+            "code": code,
+            "client_id": client_id,
+            "redirect_uri": redirect_uri,
+            "code_verifier": verifier,
+        }
+        if client_secret:
+            form["client_secret"] = client_secret
+        result = _http_json(
+            "POST",
+            self.token_url,
+            {"Content-Type": "application/x-www-form-urlencoded"},
+            urlencode(form).encode("utf-8"),
+        )
+        access_token = result.get("access_token")
+        if not access_token:
+            raise CliError("oauth exchange failed: no access_token")
+        refresh_token = result.get("refresh_token")
+        if not refresh_token and not self.tokens.get("refresh_token"):
+            raise CliError("oauth exchange failed: no refresh_token")
+
+        ttl = int(result.get("expires_in", 3600))
+        expiry = (datetime.now(UTC) + timedelta(seconds=ttl)).isoformat().replace("+00:00", "Z")
+        self.tokens["access_token"] = access_token
+        self.tokens["expiry"] = expiry
+        self.tokens["token_type"] = result.get("token_type", "Bearer")
+        if refresh_token:
+            self.tokens["refresh_token"] = refresh_token
+        scopes = self._token_scopes(access_token)
+        if scopes:
+            self.tokens["scopes"] = sorted(scopes)
+        self._save_tokens()
+        has_scopes = self._has_required_tasks_scopes(access_token)
+        if has_scopes is False:
+            raise CliError("received token is missing required Google Tasks scopes")
+        if has_scopes is None:
+            print("warning: unable to verify token scopes (tokeninfo unreachable); continuing")
+        return {
+            "token_type": self.tokens["token_type"],
+            "expiry": expiry,
+            "scopes": TASKS_SCOPES,
+        }
 
     def _save_tokens(self) -> None:
         self.cfg["tokens"] = self.tokens
@@ -155,10 +263,20 @@ class GoogleTasksClient:
         self.tokens["access_token"] = access_token
         self.tokens["expiry"] = expiry
         self.tokens["token_type"] = result.get("token_type", "Bearer")
+        scopes = self._token_scopes(access_token)
+        if scopes:
+            self.tokens["scopes"] = sorted(scopes)
         self._save_tokens()
+        has_scopes = self._has_required_tasks_scopes(access_token)
+        if has_scopes is False:
+            print("Current token lacks required Google Tasks scopes. Starting OAuth re-consent...")
+            return self._interactive_auth_for_tasks_scope()
+        if has_scopes is None:
+            print("warning: unable to verify token scopes (tokeninfo unreachable); skipping scope check")
         return {
             "token_type": self.tokens["token_type"],
             "expiry": expiry,
+            "scopes": TASKS_SCOPES,
         }
 
     def _request(self, method: str, path: str, params: dict[str, str] | None = None, body: dict[str, Any] | None = None) -> dict[str, Any]:

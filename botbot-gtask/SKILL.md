@@ -50,6 +50,7 @@ Notes:
 
 - If `access_token` is expired and `refresh_token` + `client_id` + `client_secret` exist, token refresh is automatic.
 - Refreshed token data is written back to the same JSON config file.
+- `refresh` verifies the token has all required Google Tasks scopes (`https://www.googleapis.com/auth/tasks` and `https://www.googleapis.com/auth/tasks.readonly`); if not, it triggers an interactive OAuth re-consent flow and updates config.
 
 ## Run With uv
 
