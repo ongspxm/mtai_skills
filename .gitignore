@@ -1,8 +1,3 @@
 __pycache__/
+.*
 *.pyc
-*.swp
-*.tmp
-.env
-.env.*
-botbot-gtask.json
-
