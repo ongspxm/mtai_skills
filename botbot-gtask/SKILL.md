@@ -56,19 +56,20 @@ Notes:
 No external package required (stdlib only):
 
 ```bash
-uv run botbot-gtask/scripts/botbot_gtask.py ls
-uv run botbot-gtask/scripts/botbot_gtask.py refresh
-uv run botbot-gtask/scripts/botbot_gtask.py tasks --list "Personal"
-uv run botbot-gtask/scripts/botbot_gtask.py add --list "Personal" --title "Buy milk" --description "2 liters"
-uv run botbot-gtask/scripts/botbot_gtask.py add --title "Buy milk" --description "2 liters"
+uv run <skill-path>/scripts/botbot_gtask.py ls
+uv run <skill-path>/scripts/botbot_gtask.py refresh
+uv run <skill-path>/scripts/botbot_gtask.py tasks --list "Personal"
+uv run <skill-path>/scripts/botbot_gtask.py add --list "Personal" --title "Buy milk" --description "2 liters"
+uv run <skill-path>/scripts/botbot_gtask.py add --title "Buy milk" --description "2 liters"
 ```
 
 Optional explicit config path:
 
 ```bash
-uv run botbot-gtask/scripts/botbot_gtask.py --config ~/.botbot/botbot-gtask.json list-lists
+uv run <skill-path>/scripts/botbot_gtask.py --config ~/.botbot/botbot-gtask.json ls
 ```
 
 ## Script
 
 - Entrypoint: `scripts/botbot_gtask.py`
+- Replace `<skill-path>` with the actual installed skill folder path (for example: `~/.code/skills/botbot-gtask` or repo-local `botbot-gtask`).
