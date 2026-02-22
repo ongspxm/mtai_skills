@@ -12,8 +12,8 @@ Lightweight Google Tasks helper using a single Python script and JSON config.
 - List all Google Task lists.
 - Refresh Google OAuth access token and persist it to config.
 - List all tasks in a given task list (by title or id).
-- Add a task with title + description to a given task list.
-- Add a task with title + description; if list is omitted, default to the first list from `ls`.
+- Add a task with title + notes to a given task list.
+- Add a task with title + notes; if list is omitted, default to the first list from `ls`.
 - Always enforce `edit_whitelist` before adding tasks.
 
 ## Config File
@@ -57,20 +57,20 @@ Notes:
 No external package required (stdlib only):
 
 ```bash
-uv run <skill-path>/scripts/botbot_gtask.py ls
-uv run <skill-path>/scripts/botbot_gtask.py refresh
-uv run <skill-path>/scripts/botbot_gtask.py tasks --list "Personal"
-uv run <skill-path>/scripts/botbot_gtask.py add --list "Personal" --title "Buy milk" --description "2 liters"
-uv run <skill-path>/scripts/botbot_gtask.py add --title "Buy milk" --description "2 liters"
+uv run <path-to-skill>/scripts/botbot_gtask.py ls
+uv run <path-to-skill>/scripts/botbot_gtask.py refresh
+uv run <path-to-skill>/scripts/botbot_gtask.py tasks --list "Personal"
+uv run <path-to-skill>/scripts/botbot_gtask.py add --list "Personal" --title "Buy milk" --notes "2 liters"
+uv run <path-to-skill>/scripts/botbot_gtask.py add --title "Buy milk" --notes "2 liters"
 ```
 
 Optional explicit config path:
 
 ```bash
-uv run <skill-path>/scripts/botbot_gtask.py --config ~/.botbot/botbot-gtask.json ls
+uv run <path-to-skill>/scripts/botbot_gtask.py --config ~/.botbot/botbot-gtask.json ls
 ```
 
 ## Script
 
 - Entrypoint: `scripts/botbot_gtask.py`
-- Replace `<skill-path>` with the actual installed skill folder path (for example: `~/.code/skills/botbot-gtask` or repo-local `botbot-gtask`).
+- Replace `<path-to-skill>` with the actual installed skill folder path (for example: `~/.code/skills/botbot-gtask`).

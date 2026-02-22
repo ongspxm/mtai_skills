@@ -385,7 +385,7 @@ def _build_parser() -> argparse.ArgumentParser:
     p_add = sub.add_parser("add", help="Add a task to a task list")
     p_add.add_argument("--list", dest="list_name", help="Task list title or id (defaults to first list)")
     p_add.add_argument("--title", required=True, help="Task title")
-    p_add.add_argument("--description", default="", help="Task description (notes)")
+    p_add.add_argument("--notes", default="", help="Task notes")
 
     return parser
 
@@ -405,7 +405,7 @@ def main() -> int:
             print(json.dumps(client.list_tasks(args.list_name), indent=2))
             return 0
         if args.cmd == "add":
-            print(json.dumps(client.add_task(args.list_name, args.title, args.description), indent=2))
+            print(json.dumps(client.add_task(args.list_name, args.title, args.notes), indent=2))
             return 0
         raise CliError(f"unknown command: {args.cmd}")
     except CliError as exc:
