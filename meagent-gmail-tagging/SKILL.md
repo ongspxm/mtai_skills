@@ -17,18 +17,18 @@ uv run <path-to-skill>/scripts/meagent_gmail_tagging.py <command> [args]
 
 ## DESCRIPTION
 
-Use this sequence:
-1. `rules`
-2. `fetch`
-3. `tag <idx> <action|reading|junk>` for every row (auto run)
-4. `status` returns at most 20 untagged emails each time, with a header like `19 emails untagged, here is 19 of them.`
-5. after those rows, it prints guidance like `this is 20/40 untagged email. pick the best tag for each and autotag them, call status with raw_output=false to get more after thats done`.
-6. keep running `status` and tagging emails with `raw_output=false`.
-7. stop only when `status` says `everything is tagged, review these tags`.
-8. only then run `status` one more time with `raw_output=true` for final verification output.
-9. adjust tags if user requests changes
-10. `push` only after user confirms; run it with `timeout_seconds=300`; it returns JSON counts only.
-11. after `push`, run `print` with raw_output=True.
+Use this exact sequence, including `raw_output` mode:
+1. `rules` with `raw_output=false`.
+2. `fetch` with `raw_output=false`.
+3. `tag <idx> <action|reading|junk>` with `raw_output=false` for every row you tag.
+4. `status` with `raw_output=false` for iterative tagging rounds.
+5. if `status` says there are still untagged rows, keep looping:
+   run `tag ...` with `raw_output=false`, then `status` with `raw_output=false`.
+6. stop the loop only when `status` says `everything is tagged, review these tags`.
+7. run `status` once with `raw_output=true` for final verification.
+8. if user requests tag changes, run `tag ...` with `raw_output=false`, then `status` with `raw_output=true` again.
+9. run `push` only after user confirmation, with `raw_output=false` and `timeout_seconds=300`.
+10. after `push`, run `print` with `raw_output=true`.
 
 ## COMMANDS
 
@@ -42,6 +42,7 @@ Use this sequence:
 ## IMPORTANT
 
 - Do not format outputs that are already formatted by the script.
+- Default policy: when `raw_output` is not explicitly specified for a command, treat it as `raw_output=false`.
 - For final verification `status`, use raw_output=True.
 - Run `push` with raw_output=false.
 - For every iterative `status` run during tagging, use raw_output=false.

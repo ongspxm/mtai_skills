@@ -1,0 +1,17 @@
+{
+  "api_id": 123456,
+  "api_hash": "replace-with-telegram-api-hash",
+  "bot_token": "123456789:replace-with-bot-token",
+  "timezone": "America/Los_Angeles",
+  "log_folder": "~/notes/meagent-daily-logging",
+  "chats": [
+    {
+      "username": "team_ops",
+      "tag": "ops"
+    },
+    {
+      "title": "Announcements",
+      "tag": "ann"
+    }
+  ]
+}

@@ -8,12 +8,12 @@ Features are tracked in `docs/fdocs/`. Each FD has a dedicated file (`fdXXX_titl
 - `backlog`: default when none of the above apply
 
 ### fdocs Commands
-- `fdocs init`: initialize `docs/fdocs/` scaffolding and seed templates
-- `fdocs new`: create a new FD from `_TEMPLATE.md`
-- `fdocs status`: regenerate index and show active docs
-- `fdocs status --grooming`: move closed docs into `docs/fdocs/archive/`
-- `fdocs close`: close and archive a specific FD
-- `fdocs explore`: print fdocs status plus recent repo activity
+- Local runner: `python3 fdocs/scripts/fdocs.py <command>`
+- `init`: initialize `docs/fdocs/` scaffolding and seed templates
+- `new`: create a new FD from `_TEMPLATE.md`
+- `status`: regenerate index and show active docs (`--grooming` archives closed docs)
+- `close`: close and archive a specific FD
+- `explore`: print fdocs status plus recent repo activity
 
 ### Conventions
 - FD files: `docs/fdocs/fdXXX_title.md` (`XXX` is zero-padded)
@@ -30,3 +30,8 @@ Keep long-lived engineering rules in `docs/dev_guide/` and keep `AGENTS.md` conc
 - Add one short section per rule with: intent, hard requirement, examples
 - Prefer project-specific rules over generic style guidance
 - If a rule changes behavior across the codebase, update the relevant FD and mention the rule id/title
+
+### Inline Annotations (`%%`)
+- Treat each `%%` line as a direct user instruction.
+- Address every `%%` line, then remove it.
+- If any `%%` instruction is ambiguous, ask for clarification before editing.
