@@ -3,35 +3,48 @@ name: botbot-gcal
 description: Use when you need to list Google Calendar events in a time range across configured calendars, or add a calendar event to primary calendar via a lightweight JSON-configured CLI.
 ---
 
-# BotBot Google Calendar
+# BOTBOT-GCAL(1)
 
-Lightweight Google Calendar helper using a single Python script and JSON config.
+## NAME
 
-## What It Does
+`botbot-gcal` - lightweight Google Calendar CLI for listing events, adding events, and token refresh.
 
-- List events between two timestamps (inclusive) across configured calendars.
-- Add an event with start/end/title to the primary calendar.
-- Refresh Google OAuth access token and persist it to config.
-- Refresh Google OAuth access token automatically when expired and persist it to config.
+## SYNOPSIS
 
-## Config File
+```bash
+uv run <path-to-skill>/scripts/botbot_gcal.py [--config /path/to/botbot-gcal.json] <command> [args]
+```
 
-Config path resolution order:
+## DESCRIPTION
 
+Supports:
+- `ls <start> <end>` (inclusive range across configured calendars) - ALWAYS run with raw_output=True
+- `add <start> <end> <title>` (always inserts into `primary` calendar)
+- `refresh` (refresh token and validate required scope)
+
+## IMPORTANT
+
+- Always run with `uv run`.
+- `ls` returns workflow-style text lines, not raw JSON.
+- `default_timezone` controls input/output timestamp interpretation and rendering.
+- `default_calendars` can contain calendar ids (recommended), `primary`, or calendar names.
+- Expired `access_token` auto-refreshes when `refresh_token`, `client_id`, and `client_secret` are present.
+- Refreshed token data is persisted back to the same config JSON.
+- `refresh` checks scope `https://www.googleapis.com/auth/calendar` and can trigger interactive OAuth re-consent.
+
+## CONFIG
+
+Config path precedence:
 1. `--config /path/to/botbot-gcal.json`
 2. `$BOTBOT_HOME/botbot-gcal.json`
 3. `~/.botbot/botbot-gcal.json`
 
-Example config (`assets/botbot-gcal.example.json`):
+Example: `assets/botbot-gcal.example.json`
 
 ```json
 {
   "default_timezone": "+8",
-  "default_calendars": [
-    "primary",
-    "work@example.com",
-    "Team Calendar"
-  ],
+  "default_calendars": ["primary", "work@example.com", "Team Calendar"],
   "api": {
     "base_url": "https://www.googleapis.com/calendar/v3",
     "token_url": "https://oauth2.googleapis.com/token"
@@ -46,33 +59,16 @@ Example config (`assets/botbot-gcal.example.json`):
 }
 ```
 
-Notes:
-
-- `default_timezone` controls how input/output timestamps are interpreted/rendered; defaults to `+8` if omitted.
-- `default_calendars` entries may be calendar ids (recommended), `primary`, or calendar names.
-- For `add`, events are always inserted into the `primary` calendar.
-- If `access_token` is expired and `refresh_token` + `client_id` + `client_secret` exist, token refresh is automatic.
-- Refreshed token data is written back to the same JSON config file.
-- `refresh` verifies required Google Calendar scope (`https://www.googleapis.com/auth/calendar`); if missing, it triggers interactive OAuth re-consent and updates config.
-- `ls` prints a workflow-style text list (one event per line), not raw JSON.
-
-## IMPT: Run With uv -- ALWAYS MAKE SURE TO RUN IT WITH UV
-
-No external package required (stdlib only):
+## EXAMPLES
 
 ```bash
 uv run <path-to-skill>/scripts/botbot_gcal.py ls 2026-02-22 2026-02-23
-uv run <path-to-skill>/scripts/botbot_gcal.py refresh
 uv run <path-to-skill>/scripts/botbot_gcal.py add 2026-02-22T09:00:00Z 2026-02-22T09:30:00Z "Standup"
-```
-
-Optional explicit config path:
-
-```bash
+uv run <path-to-skill>/scripts/botbot_gcal.py refresh
 uv run <path-to-skill>/scripts/botbot_gcal.py --config ~/.botbot/botbot-gcal.json ls 2026-02-22 2026-02-23
 ```
 
-## Script
+## FILES
 
 - Entrypoint: `scripts/botbot_gcal.py`
-- Replace `<path-to-skill>` with the actual installed skill folder path (for example: `~/.code/skills/botbot-gcal`).
+- Replace `<path-to-skill>` with your installed skill path (for example `~/.code/skills/botbot-gcal`).

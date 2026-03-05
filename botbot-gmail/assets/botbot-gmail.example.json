@@ -1,0 +1,14 @@
+{
+  "api": {
+    "base_url": "https://gmail.googleapis.com/gmail/v1",
+    "token_url": "https://oauth2.googleapis.com/token",
+    "auth_url": "https://accounts.google.com/o/oauth2/v2/auth"
+  },
+  "tokens": {
+    "access_token": "ya29...",
+    "refresh_token": "1//...",
+    "client_id": "...apps.googleusercontent.com",
+    "client_secret": "...",
+    "expiry": "2026-02-22T10:00:00Z"
+  }
+}

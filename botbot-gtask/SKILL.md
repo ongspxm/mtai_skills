@@ -3,35 +3,51 @@ name: botbot-gtask
 description: Use when you need to list Google Task lists, list tasks in a specific list, or add a task (whitelist enforced) via a lightweight JSON-configured CLI.
 ---
 
-# BotBot Google Tasks
+# BOTBOT-GTASK(1)
 
-Lightweight Google Tasks helper using a single Python script and JSON config.
+## NAME
 
-## What It Does
+`botbot-gtask` - lightweight Google Tasks CLI for listing task lists, listing tasks, adding tasks, and token refresh.
 
-- List all Google Task lists.
-- Refresh Google OAuth access token and persist it to config.
-- List all tasks in a given task list (by title or id).
-- Add a task with title + notes to a given task list.
-- Add a task with title + notes; if list is omitted, default to the first list from `ls`.
-- Always enforce `edit_whitelist` before adding tasks.
+## SYNOPSIS
 
-## Config File
+```bash
+uv run <path-to-skill>/scripts/botbot_gtask.py [--config /path/to/botbot-gtask.json] <command> [args]
+```
 
-Config path resolution order:
+## DESCRIPTION
 
+Supports:
+- `ls` (list task lists)
+- `tasks --list <title-or-id>` (list tasks in a task list)
+- `add --title <title> --notes <notes> [--list <title-or-id>]` (create task)
+- `refresh` (refresh token and validate required scopes)
+
+If `--list` is omitted for `add`, the first list from `ls` is used.
+
+## IMPORTANT
+
+- Always run with `uv run`.
+- `add` is always gated by `edit_whitelist`.
+- OAuth scopes checked by `refresh`:
+  `https://www.googleapis.com/auth/tasks` and
+  `https://www.googleapis.com/auth/tasks.readonly`.
+- Expired `access_token` auto-refreshes when `refresh_token`, `client_id`, and `client_secret` are present.
+- Refreshed token data is persisted back to the same config JSON.
+- `refresh` can trigger interactive OAuth re-consent if required scopes are missing.
+
+## CONFIG
+
+Config path precedence:
 1. `--config /path/to/botbot-gtask.json`
 2. `$BOTBOT_HOME/botbot-gtask.json`
 3. `~/.botbot/botbot-gtask.json`
 
-Example config (`assets/botbot-gtask.example.json`):
+Example: `assets/botbot-gtask.example.json`
 
 ```json
 {
-  "edit_whitelist": [
-    "Personal",
-    "work-list-id"
-  ],
+  "edit_whitelist": ["Personal", "work-list-id"],
   "api": {
     "base_url": "https://tasks.googleapis.com/tasks/v1",
     "token_url": "https://oauth2.googleapis.com/token"
@@ -46,31 +62,18 @@ Example config (`assets/botbot-gtask.example.json`):
 }
 ```
 
-Notes:
-
-- If `access_token` is expired and `refresh_token` + `client_id` + `client_secret` exist, token refresh is automatic.
-- Refreshed token data is written back to the same JSON config file.
-- `refresh` verifies the token has all required Google Tasks scopes (`https://www.googleapis.com/auth/tasks` and `https://www.googleapis.com/auth/tasks.readonly`); if not, it triggers an interactive OAuth re-consent flow and updates config.
-
-## Run With uv
-
-No external package required (stdlib only):
+## EXAMPLES
 
 ```bash
 uv run <path-to-skill>/scripts/botbot_gtask.py ls
-uv run <path-to-skill>/scripts/botbot_gtask.py refresh
 uv run <path-to-skill>/scripts/botbot_gtask.py tasks --list "Personal"
 uv run <path-to-skill>/scripts/botbot_gtask.py add --list "Personal" --title "Buy milk" --notes "2 liters"
 uv run <path-to-skill>/scripts/botbot_gtask.py add --title "Buy milk" --notes "2 liters"
-```
-
-Optional explicit config path:
-
-```bash
+uv run <path-to-skill>/scripts/botbot_gtask.py refresh
 uv run <path-to-skill>/scripts/botbot_gtask.py --config ~/.botbot/botbot-gtask.json ls
 ```
 
-## Script
+## FILES
 
 - Entrypoint: `scripts/botbot_gtask.py`
-- Replace `<path-to-skill>` with the actual installed skill folder path (for example: `~/.code/skills/botbot-gtask`).
+- Replace `<path-to-skill>` with your installed skill path (for example `~/.code/skills/botbot-gtask`).
