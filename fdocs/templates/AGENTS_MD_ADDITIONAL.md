@@ -1,13 +1,3 @@
-# AGENTS
-
-## Design Notes
-- For any `botbot-xxx` skill, the default runtime config file location must be under `~/.botbot`.
-- Follow the existing convention: `~/.botbot/<skill-name>.json` (for example, `~/.botbot/botbot-gcal.json`).
-- If a `--config` flag is provided, that explicit path still takes precedence.
-- Code style: if a function is only used in one place, inline it; keep code clean, tight, and terse.
-- Styling requirement: prefer low abstraction; avoid unnecessary helper layers and keep implementations direct.
-- Write each skill `SKILL.md` in man-page style (for example: `NAME`, `SYNOPSIS`, `DESCRIPTION`, `EXAMPLES`).
-
 ## Feature Docs (FD) Management
 Features are tracked in `docs/fdocs/`. Each FD has a dedicated file (`fdXXX_title.md`) and `docs/fdocs/_INDEX.md` is generated from FD file frontmatter.
 
@@ -30,3 +20,13 @@ Features are tracked in `docs/fdocs/`. Each FD has a dedicated file (`fdXXX_titl
 - Archive: `docs/fdocs/archive/`
 - Source of truth: FD files (index is derived output)
 - Date format: `YYYY-MM-DD` for `planned` and `closed`
+- Keep project-wide coding rules in `docs/dev_guide/*.md`
+
+### Dev Guide
+Keep long-lived engineering rules in `docs/dev_guide/` and keep `AGENTS.md` concise.
+
+#### Conventions
+- Source of truth: `docs/dev_guide/*.md` (`README.md` is the index)
+- Add one short section per rule with: intent, hard requirement, examples
+- Prefer project-specific rules over generic style guidance
+- If a rule changes behavior across the codebase, update the relevant FD and mention the rule id/title
