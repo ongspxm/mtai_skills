@@ -3,26 +3,35 @@ name: merge-worktree
 description: Merge or cherry-pick a worktree branch back into the repo root using a single renderer script.
 ---
 
-# Merge Worktree
+# MERGE-WORKTREE(1)
 
-Use this skill when a worktree contains changes that must be merged into the
-default branch at the repo root. This workflow is driven by a single renderer
-script in the repo root.
+## NAME
 
-## Quick Start
+`merge-worktree` - merge or cherry-pick worktree changes back into repo root using rendered instructions.
 
-1. Run `bash <path-to-skill>/render-instructions.sh` from the working dir.
-2. Follow the steps in the rendered instructions to merge or cherry-pick.
+## SYNOPSIS
 
-## Workflow
+```bash
+bash <path-to-skill>/render-instructions.sh
+```
 
-1. Print the instructions with fields substituted.
-2. Run the commands in order, using `git -C <worktree_path>` for worktree ops.
-3. Resolve conflicts line-by-line with `apply_patch` only.
-4. Verify `git status` is clean, then remove the worktree shown in the output
-   (not the repo root).
+## DESCRIPTION
 
-## Helper Script
+Use when a worktree branch must be integrated into the default branch at repo root.
 
-Use `render-instructions.sh` to render the instruction template with current
-repo values (for example `bash <path-to-skill>/render-instructions.sh`).
+Workflow:
+1. Render instructions via `render-instructions.sh`.
+2. Execute commands in order.
+3. Use `git -C <worktree_path>` for worktree operations.
+4. Resolve conflicts line-by-line using `apply_patch` only.
+5. Confirm clean `git status`.
+6. Remove the worktree shown in instructions (never the repo root).
+
+## IMPORTANT
+
+- Follow rendered steps exactly.
+- Do not skip the final cleanup of the target worktree.
+
+## FILES
+
+- Helper script: `render-instructions.sh`

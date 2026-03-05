@@ -3,29 +3,43 @@ name: setup-precommit
 description: set up pre-commit for a repo
 ---
 
-#### before doing anything
-- identify the git root directory, and run all the operations there
-- look thru the files in the repo to see which languages are being used.
-- use pipx to install pre-commit if needed
+# SETUP-PRECOMMIT(1)
 
-#### setup pre-commit hooks
-details in this link: https://pre-commit.com/
-to check if the pre-commit is valid, ALWAYS run it before commiting the config yaml file
+## NAME
 
-if ".pre-commit-config.yaml" doesnt exist, create one.
-visit this pages and add everything that's active
-- https://github.com/pre-commit/pre-commit-hooks/blob/main/.pre-commit-hooks.yaml
+`setup-precommit` - initialize and configure `pre-commit` hooks for a repository.
 
-NEVER install
-- codespell
+## SYNOPSIS
 
-language specific:
-- (not exclusive, for those languages not highlighted here, find appropriate alternatives)
-- always include pre-commit rules for json and yaml file formats (the one in pre-commit-hooks, nothing else)
-- for python, use https://github.com/astral-sh/ruff-pre-commit (ruff-check --fix and ruff-format), nothing else
-- for shell files, add https://github.com/shellcheck-py/shellcheck-py (exclude SC1091)
-- for web files (html/js/css), use https://github.com/biomejs/pre-commit (> v2.1.3) (biome-check)
+```bash
+# run from git root
+pipx install pre-commit  # if missing
+pre-commit run --all-files
+```
 
-#### always make sure your files are pushed to remote
-- add gitignore overrides for ".pre-commit-config.yaml"
-- DO NOT alter the .gitignore file in any other way (no comments, no extra changes)
+## DESCRIPTION
+
+Workflow:
+1. Detect git root and run all steps there.
+2. Inspect repo languages.
+3. Install `pre-commit` with `pipx` if needed.
+4. Create/update `.pre-commit-config.yaml`.
+5. Validate config by running pre-commit before committing.
+
+## IMPORTANT
+
+- Always include JSON and YAML formatting hooks from `pre-commit-hooks`.
+- Never install `codespell`.
+- For Python, use only `astral-sh/ruff-pre-commit` with `ruff-check --fix` and `ruff-format`.
+- For shell files, use `shellcheck-py/shellcheck-py` and exclude `SC1091`.
+- For web files (`html/js/css`), use `biomejs/pre-commit` with version `> v2.1.3` and `biome-check`.
+- Add gitignore override for `.pre-commit-config.yaml` so the file is pushed.
+- Do not modify `.gitignore` in any other way.
+
+## SOURCES
+
+- `https://pre-commit.com/`
+- `https://github.com/pre-commit/pre-commit-hooks/blob/main/.pre-commit-hooks.yaml`
+- `https://github.com/astral-sh/ruff-pre-commit`
+- `https://github.com/shellcheck-py/shellcheck-py`
+- `https://github.com/biomejs/pre-commit`
